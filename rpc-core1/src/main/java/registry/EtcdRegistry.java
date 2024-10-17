@@ -100,9 +100,8 @@ public class EtcdRegistry implements Registry {
                             getOption)
                     .get()
                     .getKvs();
-            registryServiceCache.writeCache(serviceKey,serviceMetaInfoList);
-            // 解析服务信息
-            return keyValues.stream()
+
+            List<ServiceMetaInfo> serviceMetaInfoList1 = keyValues.stream()
                     .map(keyValue -> {
                         String key = keyValue.getKey().toString(StandardCharsets.UTF_8);
                         // 监听 key 的变化
@@ -111,6 +110,10 @@ public class EtcdRegistry implements Registry {
                         return JSONUtil.toBean(value, ServiceMetaInfo.class);
                     })
                     .collect(Collectors.toList());
+
+            registryServiceCache.writeCache(serviceKey,serviceMetaInfoList1);
+            // 解析服务信息
+            return serviceMetaInfoList1;
         } catch (Exception e) {
             throw new RuntimeException("获取服务列表失败", e);
         }
@@ -167,7 +170,10 @@ public class EtcdRegistry implements Registry {
 
         // 支持秒级别定时任务
         CronUtil.setMatchSecond(true);
-        CronUtil.start();
+        if(!CronUtil.getScheduler().isStarted()){
+            CronUtil.start();
+        }
+
     }
 
     @Override

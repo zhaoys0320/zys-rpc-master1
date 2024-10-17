@@ -1,5 +1,7 @@
 package proxy;
 
+import balancer.LoadBalancer;
+import balancer.LoadBalancerFactory;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
@@ -16,7 +18,9 @@ import serializer.Serializer;
 import java.io.IOException;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 服务代理（JDK 动态代理）
@@ -57,8 +61,13 @@ public class ServiceProxy implements InvocationHandler {
                 throw new RuntimeException("暂无服务地址");
             }
             //TODO 负载均衡选择服务
-            ServiceMetaInfo useServiceMetaInfo = serviceMetaInfoList.get(0);
+            LoadBalancer loadBalancer = LoadBalancerFactory.getInstance(rpcConfig.getLoadBalancer());
+            // 将调用方法名（请求路径）作为负载均衡参数
+            Map<String, Object> requestParams = new HashMap<>();
+            requestParams.put("methodName", rpcRequest.getMethodName());
+            ServiceMetaInfo useServiceMetaInfo = loadBalancer.select(requestParams, serviceMetaInfoList);
 
+//            ServiceMetaInfo useServiceMetaInfo = serviceMetaInfoList.get(0);
             try (HttpResponse httpResponse = HttpRequest.post(useServiceMetaInfo.getServiceAddress())
                     .body(bodyBytes)
                     .execute()) {

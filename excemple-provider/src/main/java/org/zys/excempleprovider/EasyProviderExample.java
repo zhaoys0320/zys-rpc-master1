@@ -31,7 +31,7 @@ public class EasyProviderExample {
         RpcConfig rpcConfig = RpcApplication.getRpcConfig();
         RegistryConfig registryConfig = rpcConfig.getRegistryConfig();
         Registry registry = new EtcdRegistry();
-        registry.init(rpcConfig.getRegistryConfig());
+        registry.init(registryConfig);
         ServiceMetaInfo serviceMetaInfo = new ServiceMetaInfo();
         serviceMetaInfo.setServiceName(serviceName);
         serviceMetaInfo.setServiceHost(rpcConfig.getServerHost());
