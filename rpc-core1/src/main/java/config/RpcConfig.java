@@ -1,5 +1,6 @@
 package config;
 
+import balancer.LoadBalancerKeys;
 import lombok.Data;
 
 /**
@@ -29,5 +30,10 @@ public class RpcConfig {
     private Integer serverPort = 8080;
 
     private RegistryConfig registryConfig = new RegistryConfig();
+
+    /**
+     * 负载均衡器
+     */
+    private String loadBalancer = LoadBalancerKeys.ROUND_ROBIN;
 
 }
