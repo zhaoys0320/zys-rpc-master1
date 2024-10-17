@@ -34,6 +34,6 @@ public class RpcConfig {
     /**
      * 负载均衡器
      */
-    private String loadBalancer = LoadBalancerKeys.ROUND_ROBIN;
+    private String loadBalancer = LoadBalancerKeys.CONSISTENT_HASH;
 
 }

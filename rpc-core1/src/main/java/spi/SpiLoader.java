@@ -46,21 +46,6 @@ public class SpiLoader {
     private static final String[] SCAN_DIRS = new String[]{RPC_SYSTEM_SPI_DIR, RPC_CUSTOM_SPI_DIR};
 
     /**
-     * 动态加载的类列表
-     */
-    private static final List<Class<?>> LOAD_CLASS_LIST = Arrays.asList(Serializer.class);
-
-    /**
-     * 加载所有类型
-     */
-    public static void loadAll() {
-        log.info("加载所有 SPI");
-        for (Class<?> aClass : LOAD_CLASS_LIST) {
-            load(aClass);
-        }
-    }
-
-    /**
      * 获取某个接口的实例
      *
      * @param tClass
