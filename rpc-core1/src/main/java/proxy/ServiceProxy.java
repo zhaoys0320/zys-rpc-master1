@@ -56,6 +56,7 @@ public class ServiceProxy implements InvocationHandler {
             if (CollUtil.isEmpty(serviceMetaInfoList)) {
                 throw new RuntimeException("暂无服务地址");
             }
+            //TODO 负载均衡选择服务
             ServiceMetaInfo useServiceMetaInfo = serviceMetaInfoList.get(0);
 
             try (HttpResponse httpResponse = HttpRequest.post(useServiceMetaInfo.getServiceAddress())
