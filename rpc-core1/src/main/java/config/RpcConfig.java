@@ -24,6 +24,8 @@ public class RpcConfig {
      * 服务器主机名
      */
     private String serverHost = "localhost";
+
+    private String serializer = "localhost";
     
     /**
      * 服务器端口号

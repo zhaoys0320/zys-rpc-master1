@@ -40,6 +40,7 @@ public class EtcdRegistry implements Registry {
      */
     private final Set<String> watchingKeySet = new ConcurrentHashSet<>();
 
+
     @Override
     public void init(RegistryConfig registryConfig) {
         client = Client.builder().endpoints(registryConfig.getAddress()).connectTimeout(Duration.ofMillis(registryConfig.getTimeout())).build();
