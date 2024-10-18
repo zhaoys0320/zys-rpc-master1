@@ -8,12 +8,15 @@ import cn.hutool.http.HttpResponse;
 import config.RpcApplication;
 import config.RpcConfig;
 import constant.RpcConstant;
+import fault.RetryStrategy;
+import fault.RetryStrategyFactory;
 import model.RpcRequest;
 import model.RpcResponse;
 import model.ServiceMetaInfo;
 import registry.EtcdRegistry;
 import serializer.JdkSerializer;
 import serializer.Serializer;
+import server.VertexHttpServer;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationHandler;
@@ -65,10 +68,20 @@ public class ServiceProxy implements InvocationHandler {
             // 将调用方法名（请求路径）作为负载均衡参数
             Map<String, Object> requestParams = new HashMap<>();
             requestParams.put("methodName", rpcRequest.getMethodName());
-            ServiceMetaInfo useServiceMetaInfo = loadBalancer.select(requestParams, serviceMetaInfoList);
-
-//            ServiceMetaInfo useServiceMetaInfo = serviceMetaInfoList.get(0);
-            try (HttpResponse httpResponse = HttpRequest.post(useServiceMetaInfo.getServiceAddress())
+            ServiceMetaInfo selectedServiceMetaInfo = loadBalancer.select(requestParams, serviceMetaInfoList);
+            // rpc 请求
+            // 使用重试机制
+            RetryStrategy retryStrategy = RetryStrategyFactory.getInstance(rpcConfig.getRetryStrategy());
+//            RpcResponse rpcResponse = retryStrategy.doRetry(() ->HttpRequest.post(selectedServiceMetaInfo.getServiceAddress())
+//                    .body(bodyBytes)
+//                    .execute()) {
+//                byte[] result = httpResponse.bodyBytes();
+//                // 反序列化
+//                RpcResponse rpcResponse = serializer.deserialize(result, RpcResponse.class);
+//                return rpcResponse.getData();
+//            }
+//            );
+            try (HttpResponse httpResponse = HttpRequest.post(selectedServiceMetaInfo.getServiceAddress())
                     .body(bodyBytes)
                     .execute()) {
                 byte[] result = httpResponse.bodyBytes();

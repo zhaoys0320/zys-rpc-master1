@@ -1,6 +1,7 @@
 package config;
 
 import balancer.LoadBalancerKeys;
+import fault.RetryStrategyKeys;
 import lombok.Data;
 
 /**
@@ -35,5 +36,10 @@ public class RpcConfig {
      * 负载均衡器
      */
     private String loadBalancer = LoadBalancerKeys.CONSISTENT_HASH;
+
+    /**
+     * 重试策略
+     */
+    private String RetryStrategy = RetryStrategyKeys.FIXED_INTERVAL;
 
 }
