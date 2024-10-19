@@ -6,6 +6,7 @@ import config.RpcApplication;
 import config.RpcConfig;
 import model.ServiceMetaInfo;
 import org.zys.rpccore1.RpcCore1Application;
+import protocol.VertxTcpServer;
 import registry.EtcdRegistry;
 import registry.LocalRegistry;
 import registry.Registry;
@@ -43,7 +44,9 @@ public class EasyProviderExample {
         }
 
         //启动web
-        HttpServer httpServer = new VertexHttpServer();
-        httpServer.doStart(RpcApplication.getRpcConfig().getServerPort());
+//        HttpServer httpServer = new VertexHttpServer();
+//        httpServer.doStart(RpcApplication.getRpcConfig().getServerPort());
+        VertxTcpServer vertxTcpServer = new VertxTcpServer();
+        vertxTcpServer.doStart(8088);
     }
 }

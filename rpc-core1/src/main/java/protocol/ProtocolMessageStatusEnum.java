@@ -1,11 +1,13 @@
 package protocol;
 
 
+import lombok.Getter;
 
 /*
 
    状态枚举
  */
+@Getter
 public enum ProtocolMessageStatusEnum {
 
     OK("ok", 20),

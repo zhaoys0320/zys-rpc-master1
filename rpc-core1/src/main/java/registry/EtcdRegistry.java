@@ -74,6 +74,7 @@ public class EtcdRegistry implements Registry {
 
         // 将键值对与租约关联起来，并设置过期时间
         PutOption putOption = PutOption.builder().withLeaseId(leaseId).build();
+//        PutOption putOption = PutOption.builder().build();
         kvClient.put(key, value, putOption).get();
         localRegisterNodeKeySet.add(registerKey);
     }

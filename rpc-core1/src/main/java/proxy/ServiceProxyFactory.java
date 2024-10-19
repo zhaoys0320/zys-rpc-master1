@@ -1,5 +1,7 @@
 package proxy;
 
+import protocol.TCPServiceProxy;
+
 import java.lang.reflect.Proxy;
 
 /**
@@ -18,6 +20,6 @@ public class ServiceProxyFactory {
         return (T) Proxy.newProxyInstance(
                 serviceClass.getClassLoader(),
                 new Class[]{serviceClass},
-                new ServiceProxy());
+                new TCPServiceProxy());
     }
 }

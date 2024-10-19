@@ -2,25 +2,18 @@ package protocol;
 
 import balancer.LoadBalancer;
 import balancer.LoadBalancerFactory;
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.IdUtil;
-import cn.hutool.http.HttpRequest;
-import cn.hutool.http.HttpResponse;
 import config.RegistryConfig;
 import config.RpcApplication;
 import config.RpcConfig;
 import constant.RpcConstant;
-import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.net.NetClient;
-import io.vertx.core.net.NetSocket;
-import io.vertx.core.net.SocketAddress;
 import model.RpcRequest;
 import model.RpcResponse;
 import model.ServiceMetaInfo;
 import registry.EtcdRegistry;
-import registry.Registry;
 import serializer.JdkSerializer;
 import serializer.Serializer;
 
@@ -31,7 +24,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CountDownLatch;
 
 /**
  * 服务代理（JDK 动态代理）
@@ -40,7 +32,7 @@ import java.util.concurrent.CountDownLatch;
  * @learn <a href="https://codefather.cn">编程宝典</a>
  * @from <a href="https://yupi.icu">编程导航知识星球</a>
  */
-public class ServiceProxy implements InvocationHandler {
+public class TCPServiceProxy implements InvocationHandler {
 
 
     @Override
@@ -68,6 +60,7 @@ public class ServiceProxy implements InvocationHandler {
             ServiceMetaInfo serviceMetaInfo = new ServiceMetaInfo();
             serviceMetaInfo.setServiceName(serviceName);
             serviceMetaInfo.setServiceVersion(RpcConstant.DEFAULT_SERVICE_VERSION);
+            serviceMetaInfo.setServicePort(8088);
             List<ServiceMetaInfo> serviceMetaInfoList = registry.serviceDiscovery(serviceMetaInfo.getServiceKey());
             if(serviceMetaInfoList.isEmpty()){
                 throw new RuntimeException("暂无服务地址");
@@ -82,7 +75,7 @@ public class ServiceProxy implements InvocationHandler {
             NetClient netClient = vertx.createNetClient();
             //TCP为异步 CompletableFuture转换为同步
             CompletableFuture<RpcResponse> responseFuture = new CompletableFuture<>();
-            netClient.connect(serviceMetaInfo.getServicePort(),selectedServiceMetaInfo.getServiceAddress(),result ->{
+            netClient.connect(serviceMetaInfo.getServicePort(),selectedServiceMetaInfo.getServiceHost(),result ->{
                 if(result.succeeded()){
                     System.out.println("Connected to TCP server");
                     io.vertx.core.net.NetSocket socket = result.result();
@@ -90,7 +83,7 @@ public class ServiceProxy implements InvocationHandler {
                     ProtocolMessage.Header header = new ProtocolMessage.Header();
                     header.setMagic(ProtocolConstant.PROTOCOL_MAGIC);
                     header.setVersion(ProtocolConstant.PROTOCOL_VERSION);
-                    header.setSerializer((byte) ProtocolMessageSerializerEnum.getEnumByValue(RpcApplication.getRpcConfig().getSerializer()).getKey());
+                    header.setSerializer((byte) 0);
                     header.setType((byte) ProtocolMessageTypeEnum.REQUEST.getKey());
                     header.setRequestId(IdUtil.getSnowflakeNextId());
                     protocolMessage.setHeader(header);
@@ -102,6 +95,7 @@ public class ServiceProxy implements InvocationHandler {
                     } catch (IOException e) {
                         throw new RuntimeException("协议消息编码错误");
                     }
+
                     socket.handler(buffer -> {
                         try {
                             ProtocolMessage<RpcResponse> rpcResponseProtocolMessage = (ProtocolMessage<RpcResponse>) ProtocolMessageDecoder.decode(buffer);
@@ -118,6 +112,7 @@ public class ServiceProxy implements InvocationHandler {
             RpcResponse rpcResponse = responseFuture.get();
             return rpcResponse.getData();
         }catch (Exception e){
+            System.out.println("代理出错");
         }
         return null;
     }
