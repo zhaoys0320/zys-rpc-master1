@@ -24,7 +24,6 @@ public class EtcdRegistry implements Registry {
     private Client client;
 
     private KV kvClient;
-    
     /**
      * 根节点
      */
