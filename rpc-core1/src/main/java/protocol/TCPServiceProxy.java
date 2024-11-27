@@ -28,9 +28,7 @@ import java.util.concurrent.CompletableFuture;
 /**
  * 服务代理（JDK 动态代理）
  *
- * @author <a href="https://github.com/liyupi">程序员鱼皮</a>
- * @learn <a href="https://codefather.cn">编程宝典</a>
- * @from <a href="https://yupi.icu">编程导航知识星球</a>
+ *
  */
 public class TCPServiceProxy implements InvocationHandler {
 
@@ -60,7 +58,7 @@ public class TCPServiceProxy implements InvocationHandler {
             ServiceMetaInfo serviceMetaInfo = new ServiceMetaInfo();
             serviceMetaInfo.setServiceName(serviceName);
             serviceMetaInfo.setServiceVersion(RpcConstant.DEFAULT_SERVICE_VERSION);
-            serviceMetaInfo.setServicePort(8088);
+            serviceMetaInfo.setServicePort(8888);
             List<ServiceMetaInfo> serviceMetaInfoList = registry.serviceDiscovery(serviceMetaInfo.getServiceKey());
             if(serviceMetaInfoList.isEmpty()){
                 throw new RuntimeException("暂无服务地址");

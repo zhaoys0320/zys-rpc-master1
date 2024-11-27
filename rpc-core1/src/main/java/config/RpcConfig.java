@@ -2,6 +2,7 @@ package config;
 
 import balancer.LoadBalancerKeys;
 import fault.RetryStrategyKeys;
+import fault.tolerant.TolerantStrategyKeys;
 import lombok.Data;
 
 /**
@@ -43,5 +44,10 @@ public class RpcConfig {
      * 重试策略
      */
     private String RetryStrategy = RetryStrategyKeys.FIXED_INTERVAL;
+
+    /**
+     * 容错策略
+     */
+    private String tolerantStrategy = TolerantStrategyKeys.FAIL_FAST;
 
 }
